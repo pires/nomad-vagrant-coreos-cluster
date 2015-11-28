@@ -1,0 +1,58 @@
+#cloud-config
+
+---
+write-files:
+  - path: /etc/nomad/client.hcl
+    permissions: '0644'
+    content: |
+      log_level = "DEBUG"
+      data_dir = "/tmp/nomad"
+      bind_addr = "$public_ipv4"
+      client {
+          enabled = true
+          servers = ["__MASTER_IP__:4647"]
+      }
+
+coreos:
+  etcd2:
+    name: __NAME__
+    listen-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    advertise-client-urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+    initial-cluster: __ETCD_SEED_CLUSTER__
+    proxy: on
+  units:
+    - name: rpcbind.service
+      enable: true
+      command: start
+    - name: rpc-statd.service
+      enable: true
+      command: start
+    - name: docker.service
+      command: start
+      drop-ins:
+        - name: 51-docker-mirror.conf
+        - __PROXY_LINE__name: http-proxy.conf
+          __PROXY_LINE__content: |
+            __PROXY_LINE__[Service]
+            __PROXY_LINE__EnvironmentFile=/etc/environment
+    - name: nomad.service
+      command: start
+      content: |
+        [Unit]
+        Description=Download and run Nomad
+        Requires=network-online.target
+        After=network-online.target
+        ConditionPathExists=/etc/nomad/client.hcl
+        [Service]
+        Type=oneshot
+        EnvironmentFile=/etc/environment
+        ExecStartPre=-/usr/bin/rm -rf /opt/bin
+        ExecStartPre=-/usr/bin/mkdir -p /opt/bin
+        ExecStartPre=/usr/bin/wget -P /tmp https://releases.hashicorp.com/nomad/__RELEASE__/nomad___RELEASE___linux_amd64.zip
+        ExecStartPre=/usr/bin/unzip /tmp/nomad___RELEASE___linux_amd64.zip -d /opt/bin
+        ExecStartPre=/usr/bin/rm -f /tmp/nomad___RELEASE___linux_amd64.zip
+        ExecStartPre=/usr/bin/chmod +x /opt/bin/nomad
+        ExecStart=/opt/bin/nomad agent -config /etc/nomad/client.hcl
+  update:
+    group: __CHANNEL__
+    reboot-strategy: off
