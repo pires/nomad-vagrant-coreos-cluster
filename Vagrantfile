@@ -66,7 +66,7 @@ DOCKERCFG = File.expand_path(ENV['DOCKERCFG'] || "~/.dockercfg")
 
 DOCKER_OPTIONS = ENV['DOCKER_OPTIONS'] || ''
 
-NOMAD_VERSION = ENV['NOMAD_VERSION'] || '0.2.0'
+NOMAD_VERSION = ENV['NOMAD_VERSION'] || '0.2.1'
 
 CHANNEL = ENV['CHANNEL'] || 'alpha'
 #if CHANNEL != 'alpha'
