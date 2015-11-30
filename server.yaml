@@ -48,7 +48,7 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         ExecStart=/bin/sh -c "while true; do etcdctl set /consul.io/members/consul-${COREOS_PRIVATE_IPV4} ${COREOS_PRIVATE_IPV4} --ttl 60; sleep 45; done"
-        ExecStop=/usr/bin/etcdctl rm consul.io/members/consul-${COREOS_PRIVATE_IPV4}
+        ExecStop=/usr/bin/etcdctl rm /consul.io/members/consul-${COREOS_PRIVATE_IPV4}
     - name: consul.service
       command: start
       content: |
