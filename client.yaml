@@ -35,22 +35,64 @@ coreos:
           __PROXY_LINE__content: |
             __PROXY_LINE__[Service]
             __PROXY_LINE__EnvironmentFile=/etc/environment
+    - name: consul-read-members.service
+      command: start
+      content: |
+        [Unit]
+        Description=Generates /tmp/consul_members file
+        After=etcd2.service
+        Requires=etcd2.service
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/sh -c '/usr/bin/etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout \'5s\' ls /consul.io/members |    \
+                 xargs -I {} /usr/bin/etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout \'5s\' get {} | sed s/^/"-join "/ |    \
+                 tr "\n" " " >> /tmp/consul_members'
+    - name: consul-discovery.service
+      command: start
+      content: |
+        [Unit]
+        Description=Consul member discovery
+        Requires=consul-read-members.service
+        After=consul-read-members.service
+        [Service]
+        EnvironmentFile=/etc/environment
+        ExecStart=/bin/sh -c "while true; do etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout '5s' set /consul.io/members/consul-${COREOS_PRIVATE_IPV4} ${COREOS_PRIVATE_IPV4} --ttl 60; sleep 30; done"
+        ExecStop=/usr/bin/etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout '5s' rm consul.io/members/consul-${COREOS_PRIVATE_IPV4}
+    - name: consul.service
+      command: start
+      content: |
+        [Unit]
+        Description=Download and run Consul for Nomad service discovery
+        Requires=consul-discovery.service
+        After=consul-discovery.service
+        ConditionPathExists=/tmp/consul.json
+        [Service]
+        EnvironmentFile=/etc/environment
+        ExecStartPre=-/usr/bin/rm -rf /opt/bin
+        ExecStartPre=/usr/bin/mkdir -p /opt/bin
+        ExecStartPre=/usr/bin/wget -P /tmp https://releases.hashicorp.com/consul/__CONSUL_VERSION__/consul___CONSUL_VERSION___linux_amd64.zip
+        ExecStartPre=/usr/bin/unzip /tmp/consul___CONSUL_VERSION___linux_amd64.zip -d /opt/bin
+        ExecStartPre=/usr/bin/rm -f /tmp/consul___CONSUL_VERSION___linux_amd64.zip
+        ExecStartPre=/usr/bin/chmod +x /opt/bin/consul
+        ExecStartPre=/usr/bin/mkdir -p /var/lib/consul/data
+        ExecStart=/bin/sh -c '/opt/bin/consul    \
+            agent                                \
+            -bind ${COREOS_PRIVATE_IPV4}         \
+            -config-file /tmp/consul.json        \
+            $(/usr/bin/cat /tmp/consul_members)'
     - name: nomad.service
       command: start
       content: |
         [Unit]
         Description=Download and run Nomad
-        Requires=network-online.target
-        After=network-online.target
+        Requires=consul.service
+        After=consul.service
         ConditionPathExists=/etc/nomad/client.hcl
         [Service]
-        Type=oneshot
         EnvironmentFile=/etc/environment
-        ExecStartPre=-/usr/bin/rm -rf /opt/bin
-        ExecStartPre=-/usr/bin/mkdir -p /opt/bin
-        ExecStartPre=/usr/bin/wget -P /tmp https://releases.hashicorp.com/nomad/__RELEASE__/nomad___RELEASE___linux_amd64.zip
-        ExecStartPre=/usr/bin/unzip /tmp/nomad___RELEASE___linux_amd64.zip -d /opt/bin
-        ExecStartPre=/usr/bin/rm -f /tmp/nomad___RELEASE___linux_amd64.zip
+        ExecStartPre=/usr/bin/wget -P /tmp https://releases.hashicorp.com/nomad/__NOMAD_VERSION__/nomad___NOMAD_VERSION___linux_amd64.zip
+        ExecStartPre=/usr/bin/unzip /tmp/nomad___NOMAD_VERSION___linux_amd64.zip -d /opt/bin
+        ExecStartPre=/usr/bin/rm -f /tmp/nomad___NOMAD_VERSION___linux_amd64.zip
         ExecStartPre=/usr/bin/chmod +x /opt/bin/nomad
         ExecStart=/opt/bin/nomad agent -config /etc/nomad/client.hcl
   update:

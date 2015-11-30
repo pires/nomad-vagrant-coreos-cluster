@@ -67,6 +67,7 @@ DOCKERCFG = File.expand_path(ENV['DOCKERCFG'] || "~/.dockercfg")
 DOCKER_OPTIONS = ENV['DOCKER_OPTIONS'] || ''
 
 NOMAD_VERSION = ENV['NOMAD_VERSION'] || '0.2.1'
+CONSUL_VERSION = ENV['CONSUL_VERSION'] || '0.5.2'
 
 CHANNEL = ENV['CHANNEL'] || 'alpha'
 #if CHANNEL != 'alpha'
@@ -364,6 +365,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         end
       end
 
+      # provision Consul configuration to all nodes
+      kHost.vm.provision :file, :source => "addons/consul/consul.json", :destination => "/tmp/consul.json"
+
       if File.exist?(cfg)
         kHost.vm.provision :file, :source => "#{cfg}", :destination => "/tmp/vagrantfile-user-data"
         if enable_proxy
@@ -379,7 +383,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         inline: <<-EOF
           sed -i"*" "/__PROXY_LINE__/d" /tmp/vagrantfile-user-data
           sed -i"*" "s,__DOCKER_OPTIONS__,#{DOCKER_OPTIONS},g" /tmp/vagrantfile-user-data
-          sed -i"*" "s,__RELEASE__,#{NOMAD_VERSION},g" /tmp/vagrantfile-user-data
+          sed -i"*" "s,__NOMAD_VERSION__,#{NOMAD_VERSION},g" /tmp/vagrantfile-user-data
+          sed -i"*" "s,__CONSUL_VERSION__,#{CONSUL_VERSION},g" /tmp/vagrantfile-user-data
           sed -i"*" "s,__CHANNEL__,v#{CHANNEL},g" /tmp/vagrantfile-user-data
           sed -i"*" "s,__NAME__,#{hostname},g" /tmp/vagrantfile-user-data
           sed -i"*" "s|__MASTER_IP__|#{MASTER_IP}|g" /tmp/vagrantfile-user-data
