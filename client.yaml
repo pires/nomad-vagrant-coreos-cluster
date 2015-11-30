@@ -44,9 +44,9 @@ coreos:
         Requires=etcd2.service
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/sh -c '/usr/bin/etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout \'5s\' ls /consul.io/members |    \
-                 xargs -I {} /usr/bin/etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout \'5s\' get {} | sed s/^/"-join "/ |    \
-                 tr "\n" " " >> /tmp/consul_members'
+        ExecStart=/usr/bin/sh -c '/usr/bin/etcdctl ls /consul.io/members |    \
+                 xargs -I {} /usr/bin/etcdctl get {} | sed s/^/"-join "/ |    \
+                 tr "\n" " " > /tmp/consul_members'
     - name: consul-discovery.service
       command: start
       content: |
@@ -56,8 +56,8 @@ coreos:
         After=consul-read-members.service
         [Service]
         EnvironmentFile=/etc/environment
-        ExecStart=/bin/sh -c "while true; do etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout '5s' set /consul.io/members/consul-${COREOS_PRIVATE_IPV4} ${COREOS_PRIVATE_IPV4} --ttl 60; sleep 30; done"
-        ExecStop=/usr/bin/etcdctl --endpoint=http://__MASTER_IP__:2379 --timeout '5s' rm /consul.io/members/consul-${COREOS_PRIVATE_IPV4}
+        ExecStart=/bin/sh -c "while true; do etcdctl set /consul.io/members/consul-${COREOS_PRIVATE_IPV4} ${COREOS_PRIVATE_IPV4} --ttl 60; sleep 30; done"
+        ExecStop=/usr/bin/etcdctl rm /consul.io/members/consul-${COREOS_PRIVATE_IPV4}
     - name: consul.service
       command: start
       content: |
