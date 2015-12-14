@@ -11,6 +11,9 @@ write-files:
       client {
           enabled = true
           servers = ["__MASTER_IP__:4647"]
+          options = {
+              consul.address = "$private_ipv4:8500"
+          }
       }
 
 coreos:
