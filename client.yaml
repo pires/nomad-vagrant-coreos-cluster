@@ -2,6 +2,20 @@
 
 ---
 write-files:
+  - path: /etc/consul/consul.json
+    permissions: '0644'
+    content: |
+      {
+          "data_dir": "/var/lib/consul/data",
+          "log_level": "INFO",
+          "server": true,
+          "disable_update_check": true,
+          "client_addr": "$private_ipv4",
+          "ports": {
+            "dns": 53
+          },
+          "recursor": "8.8.8.8"
+      }
   - path: /etc/nomad/client.hcl
     permissions: '0644'
     content: |
@@ -68,7 +82,6 @@ coreos:
         Description=Download and run Consul for Nomad service discovery
         Requires=consul-discovery.service
         After=consul-discovery.service
-        ConditionPathExists=/tmp/consul.json
         [Service]
         EnvironmentFile=/etc/environment
         ExecStartPre=-/usr/bin/rm -rf /opt/bin
@@ -81,7 +94,7 @@ coreos:
         ExecStart=/bin/sh -c '/opt/bin/consul    \
             agent                                \
             -bind ${COREOS_PRIVATE_IPV4}         \
-            -config-file /tmp/consul.json        \
+            -config-file /etc/consul/consul.json        \
             $(/usr/bin/cat /tmp/consul_members)'
     - name: nomad.service
       command: start

@@ -365,9 +365,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         end
       end
 
-      # provision Consul configuration to all nodes
-      kHost.vm.provision :file, :source => "addons/consul/consul.json", :destination => "/tmp/consul.json"
-
       if File.exist?(cfg)
         kHost.vm.provision :file, :source => "#{cfg}", :destination => "/tmp/vagrantfile-user-data"
         if enable_proxy
