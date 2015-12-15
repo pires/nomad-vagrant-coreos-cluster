@@ -39,6 +39,48 @@ source ~/.bash_profile
 
 New terminal windows will have this set for you.
 
+## Run example
+
+Just for the sake of curiosity, check the cluster status:
+```
+nomad server-members
+nomad node-status
+```
+
+Now, let's deploy Nginx example:
+
+```
+nomad run web.hcl
+```
+
+Check its status and its registration on Consul:
+
+```
+nomad status web
+curl http://172.17.9.100:8500/v1/catalog/service/web
+```
+
+You should see something like
+
+```
+[
+  {
+    "Node":"client-01",
+    "Address":"172.17.9.101",
+    "ServiceID":"nomad-83143b33-4550-64f0-1258-f029d0ab2833",
+    "ServiceName":"web",
+    "ServiceTags":[
+      "lb-external"
+    ],
+    "ServiceAddress":"10.0.2.15",
+    "ServicePort":11080,
+    "ServiceEnableTagOverride":false,
+    "CreateIndex":43,
+    "ModifyIndex":46
+  }
+]
+```
+
 ## Clean-up
 
 ```
