@@ -47,6 +47,10 @@ coreos:
     - name: docker.service
       command: start
       drop-ins:
+        - name: "50-docker-dns.conf"
+          content: |
+            [Service]
+            Environment=DOCKER_OPTS='--dns="$private_ipv4"'
         - name: 51-docker-mirror.conf
         - __PROXY_LINE__name: http-proxy.conf
           __PROXY_LINE__content: |
