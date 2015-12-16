@@ -24,6 +24,7 @@ write-files:
       bind_addr = "$private_ipv4"
       client {
           enabled = true
+          network_interface = "eth1"
           servers = ["__MASTER_IP__:4647"]
           options = {
               consul.address = "$private_ipv4:8500"

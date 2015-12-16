@@ -94,16 +94,16 @@ $ curl http://172.17.9.100:8500/v1/catalog/service/web
   {
     "Node":"client-01",
     "Address":"172.17.9.101",
-    "ServiceID":"nomad-83143b33-4550-64f0-1258-f029d0ab2833",
+    "ServiceID":"nomad-registered-service-22ba6909-dacf-6965-519c-9cd7f8a67844",
     "ServiceName":"web",
     "ServiceTags":[
       "lb-external"
     ],
-    "ServiceAddress":"10.0.2.15",
+    "ServiceAddress":"172.17.9.101",
     "ServicePort":11080,
     "ServiceEnableTagOverride":false,
-    "CreateIndex":43,
-    "ModifyIndex":46
+    "CreateIndex":102,
+    "ModifyIndex":104
   }
 ]
 ```
