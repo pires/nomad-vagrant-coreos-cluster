@@ -1,6 +1,7 @@
 # nomad-vagrant-coreos-cluster
 Turnkey **[Nomad](https://github.com/hashicorp/nomad)**
-cluster setup with **[Vagrant](https://www.vagrantup.com)** (1.7.2+) and
+cluster with **[Consul](https://github.com/hashicorp/consul)** integration
+on top of **[Vagrant](https://www.vagrantup.com)** (1.7.2+) and
 **[CoreOS](https://coreos.com)**.
 
 ## Pre-requisites
