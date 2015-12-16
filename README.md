@@ -41,28 +41,54 @@ New terminal windows will have this set for you.
 
 ## Run example
 
-Just for the sake of curiosity, check the cluster status:
+Just for the sake of curiosity, the cluster status should be something like:
 ```
-nomad server-members
-nomad node-status
+$ nomad server-members
+Name           Addr          Port  Status  Proto  Build     DC   Region
+server.global  172.17.9.100  4648  alive   2      0.2.3rc1  dc1  global
+
+$ nomad node-status
+ID                                    DC   Name       Class   Drain  Status
+22df522d-8570-e1f7-5eed-123ddbff9b5d  dc1  client-02  <none>  false  ready
+90ec6da6-4bad-2739-43a7-d990b71d7361  dc1  client-01  <none>  false  ready
 ```
 
 Now, let's deploy Nginx example:
 
 ```
-nomad run web.hcl
+$ nomad run web.hcl
+==> Monitoring evaluation "d3bebd86-37a4-2702-9039-16c31e266f82"
+    Evaluation triggered by job "web"
+    Allocation "41f2cb87-17cf-6bd6-c9c9-c5576f0095bc" created: node "22df522d-8570-e1f7-5eed-123ddbff9b5d", group "servers"
+    Allocation "d75a0f5a-aae1-826e-2cc8-4b8770455761" created: node "90ec6da6-4bad-2739-43a7-d990b71d7361", group "servers"
+    Evaluation status changed: "pending" -> "complete"
+==> Evaluation "d3bebd86-37a4-2702-9039-16c31e266f82" finished with status "complete"
 ```
 
-Check its status and its registration on Consul:
+Check its status:
 
 ```
-nomad status web
-curl http://172.17.9.100:8500/v1/catalog/service/web
+$ nomad status web
+ID          = web
+Name        = web
+Type        = service
+Priority    = 50
+Datacenters = dc1
+Status      = <none>
+
+==> Evaluations
+ID                                    Priority  TriggeredBy   Status
+d3bebd86-37a4-2702-9039-16c31e266f82  50        job-register  complete
+
+==> Allocations
+ID                                    EvalID                                NodeID                                TaskGroup  Desired  Status
+41f2cb87-17cf-6bd6-c9c9-c5576f0095bc  d3bebd86-37a4-2702-9039-16c31e266f82  22df522d-8570-e1f7-5eed-123ddbff9b5d  servers    run      running
 ```
 
-You should see something like
+and its registration on Consul:
 
 ```
+$ curl http://172.17.9.100:8500/v1/catalog/service/web
 [
   {
     "Node":"client-01",
