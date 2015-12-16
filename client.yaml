@@ -21,7 +21,7 @@ write-files:
     content: |
       log_level = "DEBUG"
       data_dir = "/tmp/nomad"
-      bind_addr = "$public_ipv4"
+      bind_addr = "$private_ipv4"
       client {
           enabled = true
           servers = ["__MASTER_IP__:4647"]
