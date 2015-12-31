@@ -1,3 +1,4 @@
 .vagrant
 .dockercfg
 temp/*
+log
