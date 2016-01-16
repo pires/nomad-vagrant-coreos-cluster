@@ -89,7 +89,7 @@ ID                                    EvalID                                Node
 and its registration on Consul:
 
 ```
-$ curl http://172.17.9.100:8500/v1/catalog/service/web
+$ curl "${NOMAD_ADDR%:*}:8500/v1/catalog/service/web"
 [
   {
     "Node":"client-01",

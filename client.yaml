@@ -92,7 +92,7 @@ coreos:
         ExecStartPre=-/usr/bin/rm -rf /opt/bin
         ExecStartPre=/usr/bin/mkdir -p /opt/bin
         ExecStartPre=/usr/bin/wget -P /tmp https://releases.hashicorp.com/consul/__CONSUL_VERSION__/consul___CONSUL_VERSION___linux_amd64.zip
-        ExecStartPre=/usr/bin/unzip /tmp/consul___CONSUL_VERSION___linux_amd64.zip -d /opt/bin
+        ExecStartPre=/usr/bin/unzip -o /tmp/consul___CONSUL_VERSION___linux_amd64.zip -d /opt/bin
         ExecStartPre=/usr/bin/rm -f /tmp/consul___CONSUL_VERSION___linux_amd64.zip
         ExecStartPre=/usr/bin/chmod +x /opt/bin/consul
         ExecStartPre=/usr/bin/mkdir -p /var/lib/consul/data
@@ -112,9 +112,10 @@ coreos:
         [Service]
         EnvironmentFile=/etc/environment
         ExecStartPre=/usr/bin/wget -P /tmp https://releases.hashicorp.com/nomad/__NOMAD_VERSION__/nomad___NOMAD_VERSION___linux_amd64.zip
-        ExecStartPre=/usr/bin/unzip /tmp/nomad___NOMAD_VERSION___linux_amd64.zip -d /opt/bin
+        ExecStartPre=/usr/bin/unzip -o /tmp/nomad___NOMAD_VERSION___linux_amd64.zip -d /opt/bin
         ExecStartPre=/usr/bin/rm -f /tmp/nomad___NOMAD_VERSION___linux_amd64.zip
         ExecStartPre=/usr/bin/chmod +x /opt/bin/nomad
+        ExecStartPre=/bin/sh -xc 'iface=$(ip -o -4 route get __MASTER_IP__ | awk "{print \$3}"); sed -e "s|network_interface.*|network_interface = \\"$iface\\"|" -i /etc/nomad/client.hcl'
         ExecStart=/opt/bin/nomad agent -config /etc/nomad/client.hcl
   update:
     group: __CHANNEL__
