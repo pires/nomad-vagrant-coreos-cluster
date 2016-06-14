@@ -14,7 +14,8 @@ write-files:
           "ports": {
             "dns": 53
           },
-          "recursor": "8.8.8.8"
+          "recursor": "8.8.8.8",
+          "ui_dir": "/srv/consul-ui"
       }
   - path: /etc/nomad/server.hcl
     permissions: '0644'
@@ -79,6 +80,9 @@ coreos:
         ExecStartPre=/usr/bin/rm -f /tmp/consul___CONSUL_VERSION___linux_amd64.zip
         ExecStartPre=/usr/bin/chmod +x /opt/bin/consul
         ExecStartPre=/usr/bin/mkdir -p /var/lib/consul/data
+        ExecStartPre=/usr/bin/wget -P /tmp https://releases.hashicorp.com/consul/__CONSUL_VERSION__/consul___CONSUL_VERSION___web_ui.zip
+        ExecStartPre=/usr/bin/mkdir -p /srv/consul-ui
+        ExecStartPre=/usr/bin/unzip /tmp/consul___CONSUL_VERSION___web_ui.zip -d /srv/consul-ui
         ExecStart=/opt/bin/consul           \
             agent                           \
             -bind ${COREOS_PRIVATE_IPV4}    \
