@@ -45,25 +45,24 @@ New terminal windows will have this set for you.
 Just for the sake of curiosity, the cluster status should be something like:
 ```
 $ nomad server-members
-Name           Addr          Port  Status  Proto  Build     DC   Region
-server.global  172.17.9.100  4648  alive   2      0.3.2  dc1  global
+Name           Address       Port  Status  Leader  Protocol  Build     Datacenter  Region
+server.global  172.17.9.100  4648  alive   true    2         0.4.0dev  dc1         global
 
 $ nomad node-status
-ID                                    DC   Name       Class   Drain  Status
-22df522d-8570-e1f7-5eed-123ddbff9b5d  dc1  client-02  <none>  false  ready
-90ec6da6-4bad-2739-43a7-d990b71d7361  dc1  client-01  <none>  false  ready
+ID        DC   Name       Class   Drain  Status
+363a2321  dc1  client-02  <none>  false  ready
+fa511f91  dc1  client-01  <none>  false  ready
 ```
 
 Now, let's deploy Nginx example:
 
 ```
 $ nomad run web.hcl
-==> Monitoring evaluation "d3bebd86-37a4-2702-9039-16c31e266f82"
+==> Monitoring evaluation "bb78252e"
     Evaluation triggered by job "web"
-    Allocation "41f2cb87-17cf-6bd6-c9c9-c5576f0095bc" created: node "22df522d-8570-e1f7-5eed-123ddbff9b5d", group "servers"
-    Allocation "d75a0f5a-aae1-826e-2cc8-4b8770455761" created: node "90ec6da6-4bad-2739-43a7-d990b71d7361", group "servers"
+    Allocation "8a0ed733" created: node "363a2321", group "servers"
     Evaluation status changed: "pending" -> "complete"
-==> Evaluation "d3bebd86-37a4-2702-9039-16c31e266f82" finished with status "complete"
+==> Evaluation "bb78252e" finished with status "complete"
 ```
 
 Check its status:
@@ -75,15 +74,12 @@ Name        = web
 Type        = service
 Priority    = 50
 Datacenters = dc1
-Status      = <none>
+Status      = running
+Periodic    = false
 
-==> Evaluations
-ID                                    Priority  TriggeredBy   Status
-d3bebd86-37a4-2702-9039-16c31e266f82  50        job-register  complete
-
-==> Allocations
-ID                                    EvalID                                NodeID                                TaskGroup  Desired  Status
-41f2cb87-17cf-6bd6-c9c9-c5576f0095bc  d3bebd86-37a4-2702-9039-16c31e266f82  22df522d-8570-e1f7-5eed-123ddbff9b5d  servers    run      running
+Allocations
+ID        Eval ID   Node ID   Task Group  Desired  Status
+8a0ed733  bb78252e  363a2321  servers     run      running
 ```
 
 and its registration on Consul:
@@ -187,7 +183,7 @@ Most aspects of your cluster setup can be customized with environment variables.
 
  - **NOMAD_VERSION** defines the specific Nomad version being used.
 
-   Defaults to `0.3.2`.
+   Defaults to `0.4.0-rc1`.
 
 So, in order to start, say, a Nomad cluster with 3 client nodes, 4GB of RAM and 2 vCPUs per client, one would run:
 
