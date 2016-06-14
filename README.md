@@ -219,19 +219,8 @@ you which to mount the allowed syntax is...
   disabled: false
 ```
 
-### Usage
-
-Congratulations! You're now ready to use your Nomad cluster.
-
-```
-$ nomad node-status
-ID                                    DC   Name       Class   Drain  Status
-eb2321fc-3ad6-ac98-8e18-317dfe74a527  dc1  client-02  <none>  false  ready
-98f86ee3-ae00-6173-5728-2154ca26e32b  dc1  client-01  <none>  false  ready
-```
-
 ## Licensing
 
-This work is [open source](http://opensource.org/osd), and is licensed under the [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0).
+This work is [open-source](http://opensource.org/osd), and is licensed under the [Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0).
 
 
