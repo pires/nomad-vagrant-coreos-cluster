@@ -26,9 +26,9 @@ write-files:
           enabled = true
           network_interface = "eth1"
           servers = ["__MASTER_IP__:4647"]
-          options = {
-              consul.address = "$private_ipv4:8500"
-          }
+      }
+      consul {
+          address = "$private_ipv4:8500"
       }
 
 coreos:
