@@ -44,6 +44,8 @@ if OS.windows?
   exit
 end
 
+required_plugins.push('vagrant-timezone')
+
 required_plugins.each do |plugin|
   need_restart = false
   unless Vagrant.has_plugin? plugin
@@ -119,6 +121,9 @@ REMOVE_VAGRANTFILE_USER_DATA_BEFORE_HALT = (ENV['REMOVE_VAGRANTFILE_USER_DATA_BE
 MOUNT_POINTS = YAML::load_file('synced_folders.yaml')
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # always use host timezone in VMs
+  config.timezone.value = :host
+ 
   # always use Vagrants' insecure key
   config.ssh.insert_key = false
   config.ssh.forward_agent = true
