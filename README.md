@@ -183,7 +183,7 @@ Most aspects of your cluster setup can be customized with environment variables.
 
  - **NOMAD_VERSION** defines the specific Nomad version being used.
 
-   Defaults to `0.4.0-rc1`.
+   Defaults to `0.4.0-rc2`.
 
 So, in order to start, say, a Nomad cluster with 3 client nodes, 4GB of RAM and 2 vCPUs per client, one would run:
 
