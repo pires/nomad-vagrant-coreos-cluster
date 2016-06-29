@@ -46,7 +46,7 @@ Just for the sake of curiosity, the cluster status should be something like:
 ```
 $ nomad server-members
 Name           Address       Port  Status  Leader  Protocol  Build     Datacenter  Region
-server.global  172.17.9.100  4648  alive   true    2         0.4.0dev  dc1         global
+server.global  172.17.9.100  4648  alive   true    2         0.4.0     dc1         global
 
 $ nomad node-status
 ID        DC   Name       Class   Drain  Status
@@ -183,7 +183,7 @@ Most aspects of your cluster setup can be customized with environment variables.
 
  - **NOMAD_VERSION** defines the specific Nomad version being used.
 
-   Defaults to `0.4.0-rc2`.
+   Defaults to `0.4.0`.
 
 So, in order to start, say, a Nomad cluster with 3 client nodes, 4GB of RAM and 2 vCPUs per client, one would run:
 
