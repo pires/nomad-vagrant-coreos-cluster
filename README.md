@@ -1,7 +1,7 @@
 # nomad-vagrant-coreos-cluster
 Turnkey **[Nomad](https://github.com/hashicorp/nomad)**
 cluster with **[Consul](https://github.com/hashicorp/consul)** integration
-on top of **[Vagrant](https://www.vagrantup.com)** (1.7.2+) and
+on top of **[Vagrant](https://www.vagrantup.com)** (1.8.6 or newer) and
 **[CoreOS](https://coreos.com)**.
 
 ## Pre-requisites
@@ -45,24 +45,24 @@ New terminal windows will have this set for you.
 Just for the sake of curiosity, the cluster status should be something like:
 ```
 $ nomad server-members
-Name           Address       Port  Status  Leader  Protocol  Build     Datacenter  Region
-server.global  172.17.9.100  4648  alive   true    2         0.4.1     dc1         global
+Name           Address       Port  Status  Leader  Protocol  Build  Datacenter  Region
+server.global  172.17.9.100  4648  alive   true    2         0.5.2  dc1         global
 
 $ nomad node-status
 ID        DC   Name       Class   Drain  Status
-363a2321  dc1  client-02  <none>  false  ready
-fa511f91  dc1  client-01  <none>  false  ready
+8ce1a08c  dc1  client-02  <none>  false  ready
+8e2fac6e  dc1  client-01  <none>  false  ready
 ```
 
 Now, let's deploy Nginx example:
 
 ```
 $ nomad run web.hcl
-==> Monitoring evaluation "bb78252e"
+==> Monitoring evaluation "ce0bb997"
     Evaluation triggered by job "web"
-    Allocation "8a0ed733" created: node "363a2321", group "servers"
+    Allocation "6fab11af" created: node "8ce1a08c", group "servers"
     Evaluation status changed: "pending" -> "complete"
-==> Evaluation "bb78252e" finished with status "complete"
+==> Evaluation "ce0bb997" finished with status "complete"
 ```
 
 Check its status:
@@ -77,9 +77,13 @@ Datacenters = dc1
 Status      = running
 Periodic    = false
 
+Summary
+Task Group  Queued  Starting  Running  Failed  Complete  Lost
+servers     0       0         1        0       0         0
+
 Allocations
-ID        Eval ID   Node ID   Task Group  Desired  Status
-8a0ed733  bb78252e  363a2321  servers     run      running
+ID        Eval ID   Node ID   Task Group  Desired  Status   Created At
+6fab11af  ce0bb997  8ce1a08c  servers     run      running  01/02/17 13:53:23 WET
 ```
 
 and its registration on Consul:
@@ -87,20 +91,24 @@ and its registration on Consul:
 ```
 $ curl "${NOMAD_ADDR%:*}:8500/v1/catalog/service/web"
 [
-  {
-    "Node":"client-01",
-    "Address":"172.17.9.101",
-    "ServiceID":"nomad-registered-service-22ba6909-dacf-6965-519c-9cd7f8a67844",
-    "ServiceName":"web",
-    "ServiceTags":[
-      "lb-external"
-    ],
-    "ServiceAddress":"172.17.9.101",
-    "ServicePort":11080,
-    "ServiceEnableTagOverride":false,
-    "CreateIndex":102,
-    "ModifyIndex":104
-  }
+   {
+      "Node":"client-02",
+      "Address":"172.17.9.102",
+      "TaggedAddresses":{
+         "lan":"172.17.9.102",
+         "wan":"172.17.9.102"
+      },
+      "ServiceID":"_nomad-executor-6fab11af-dc45-932c-d14c-fdfbc6fd5476-nginx-web-lb-external",
+      "ServiceName":"web",
+      "ServiceTags":[
+         "lb-external"
+      ],
+      "ServiceAddress":"172.17.9.102",
+      "ServicePort":11080,
+      "ServiceEnableTagOverride":false,
+      "CreateIndex":37,
+      "ModifyIndex":39
+   }
 ]
 ```
 
